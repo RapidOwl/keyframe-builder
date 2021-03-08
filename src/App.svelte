@@ -1,6 +1,7 @@
 <script>
 	let animationName = 'my-animation';
 
+	// TODO Is this the best way to model this?
 	let stages = [
 		{ name: 'Start', length: 3 },
 		{ name: 'Second', length: 5 },
@@ -8,7 +9,7 @@
 	];
 	$: calculatedLength = stages.reduce((a, b) => a + (b['length'] || 0), 0);
 	$: keyframeDeclarations = stages.map((stage) => {
-		return `\t${calculatePercentage(stage.length)}%\n\t{\n\t}\n`;
+		return `\t${calculatePercentage(stage.length)}% {\n\t}\n`;
 	});
 
 	let newStageName = '';
@@ -37,28 +38,42 @@
 </header>
 <main>
 	<section>
-		<label for="AnimationName">Animation Name</label>
-		<input id="AnimationName" type="text" bind:value={animationName} />
+		<article>
+			<label for="AnimationName">Animation Name</label>
+			<input id="AnimationName" type="text" bind:value={animationName} />
+		</article>
 
-		<p>(Total Length: {calculatedLength} seconds)</p>
-		{#each stages as { name, length }, i}
-			<h2>{name} ({calculatePercentage(length)}%)</h2>
-			<label for="StageLength[{i}]">Length</label>
-			<input type="number" id="StageLength[{i}]" bind:value={length} />
-			{#if i !== 0}
-				<button on:click={() => removeStage(i)}>❌</button>
-			{/if}
-		{/each}
-		<h2>End (100%)</h2>
-	</section>
-	<hr />
-	<section>
-		<input type="text" bind:value={newStageName} />
-		<input type="number" bind:value={newStageLength} />
-		<button on:click={addStage} disabled={newStageName.length === 0}>Add Stage</button>
+		<article>
+			<h2>Keyframes</h2>
+			<h4>0%</h4>
+			{#each stages as { name, length }, i}
+				<h4>{calculatePercentage(length)}%</h4>
+				<label for="StageLength[{i}]">Length</label>
+				<input type="number" id="StageLength[{i}]" bind:value={length} />
+				{#if i !== 0}
+					<button on:click={() => removeStage(i)} aria-label="Remove animation stage"
+						>❌</button
+					>
+				{/if}
+			{/each}
+			<h4>End (100%)</h4>
+		</article>
+
+		<article>
+			<h4>Add a new keyframe</h4>
+			<!-- <input type="text" bind:value={newStageName} /> -->
+			<label for="NewStageLength">Seconds until this keyframe</label>
+			<input type="number" bind:value={newStageLength} />
+			<button on:click={addStage} disabled={newStageName.length === 0}>Add keyframe</button>
+		</article>
 	</section>
 	<!-- <pre>{JSON.stringify(stages)}</pre> -->
-	<pre>
+	<section>
+		<pre>
+.animated-element &#123;
+	animation: {animationName} {calculatedLength}s;
+&#125;
+
 @keyframes {animationName} &#123;
 	0% &#123;
 	&#125;
@@ -68,7 +83,29 @@
 	&#125;
 &#125;
 	</pre>
+	</section>
 </main>
 
 <style>
+	main {
+		display: flex;
+		flex-direction: row;
+	}
+
+	pre {
+		tab-size: 4;
+	}
+
+	article {
+		margin: 0 24px 24px 0;
+	}
+
+	article,
+	pre {
+		padding: 16px;
+		border-radius: 16px;
+		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12), 0 2px 2px rgba(0, 0, 0, 0.12),
+			0 4px 4px rgba(0, 0, 0, 0.12), 0 8px 8px rgba(0, 0, 0, 0.12),
+			0 16px 16px rgba(0, 0, 0, 0.12);
+	}
 </style>
