@@ -1,4 +1,5 @@
 <script>
+	// TODO Animate the background using the keyframe stuffs.
 	// TODO Audit this whole thing for accessibility.
 	// TODO Make into components. If nothing else it'll aid readability.
 	// TODO Make buttons so we can switch units between seconds and milliseconds.
@@ -110,6 +111,10 @@
 			display: flex;
 			flex-direction: row;
 		}
+	}
+
+	h1 {
+		margin: 24px 0;
 	}
 
 	h1,
