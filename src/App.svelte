@@ -1,4 +1,8 @@
 <script>
+	// TODO Audit this whole thing for accessibility.
+	// TODO Make into components. If nothing else it'll aid readability.
+	// TODO Make buttons so we can switch units between seconds and milliseconds.
+
 	import GitHubCorner from './GitHubCorner.svelte';
 
 	let animationName = 'my-animation';
@@ -7,27 +11,37 @@
 	let timeUntilFinalKeyframe = 2;
 
 	$: calculatedLength =
-		keyframes.reduce((a, b) => a + (b['length'] || 0), 0) + timeUntilFinalKeyframe;
+		Math.round(
+			(keyframes.reduce((a, b) => a + (b['length'] || 0), 0) + timeUntilFinalKeyframe) * 100
+		) / 100;
 
-	$: keyframeDeclarations = keyframes.map((stage) => {
-		return `\t${calculatePercentage(stage.length)}% {\n\t}\n`;
+	$: keyframePercentages = keyframes.map((keyframe, index) => {
+		let totalPercentage = 0;
+
+		for (var i = 0; i <= index; i++) {
+			totalPercentage += calculatePercentage(keyframes[i].length);
+		}
+
+		return totalPercentage;
 	});
 
-	function addStage() {
-		if (newStageName.length > 0) {
-			keyframes = [...keyframes, { name: newStageName, length: timeUntilNewKeyframe }];
-			newStageName = '';
-		}
+	$: keyframeCSS = keyframes.map((keyframe, index) => {
+		return `\t${keyframePercentages[index]}% {\n\t}\n`;
+	});
+
+	function addKeyframe() {
+		keyframes = [...keyframes, { length: timeUntilNewKeyframe }];
+		timeUntilNewKeyframe = 0;
 	}
 
-	function removeStage(i) {
+	function removeKeyframe(i) {
 		keyframes = keyframes.filter((keyframes, index) => {
 			return i !== index;
 		});
 	}
 
 	function calculatePercentage(length) {
-		return Math.round(((length + 1) / calculatedLength) * 100);
+		return Math.round((length / calculatedLength) * 100);
 	}
 </script>
 
@@ -41,7 +55,7 @@
 			<h4>Add a new keyframe</h4>
 			<label for="NewStageLength">Seconds until this keyframe</label>
 			<input type="number" bind:value={timeUntilNewKeyframe} />
-			<button on:click={addStage}>Add keyframe</button>
+			<button on:click={addKeyframe}>Add keyframe</button>
 		</article>
 
 		<article>
@@ -52,10 +66,10 @@
 			</div>
 			{#each keyframes as { length }, i}
 				<fieldset class="keyframe">
-					<label for="StageLength[{i}]">{calculatePercentage(length)}%</label>
+					<label for="StageLength[{i}]">{keyframePercentages[i]}%</label>
 					<input type="number" id="StageLength[{i}]" bind:value={length} />
 					<button
-						on:click={() => removeStage(i)}
+						on:click={() => removeKeyframe(i)}
 						aria-label="Remove animation stage"
 						class="close-button">❌</button
 					>
@@ -76,7 +90,7 @@
 @keyframes {animationName} &#123;
 	0% &#123;
 	&#125;
-{#each keyframeDeclarations as declaration}
+{#each keyframeCSS as declaration}
 	{declaration}
 {/each}&#9;100% &#123;
 	&#125;
