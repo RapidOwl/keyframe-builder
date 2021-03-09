@@ -2,34 +2,34 @@
 	let animationName = 'my-animation';
 
 	// TODO Is this the best way to model this?
-	let stages = [
-		{ name: 'Start', length: 3 },
-		{ name: 'Second', length: 5 },
-		{ name: 'Third', length: 10 },
-	];
-	$: calculatedLength = stages.reduce((a, b) => a + (b['length'] || 0), 0);
-	$: keyframeDeclarations = stages.map((stage) => {
+	let keyframes = [{ length: 2 }, { length: 2 }, { length: 2 }];
+
+	$: calculatedLength =
+		keyframes.reduce((a, b) => a + (b['length'] || 0), 0) + timeUntilFinalKeyframe;
+
+	$: keyframeDeclarations = keyframes.map((stage) => {
 		return `\t${calculatePercentage(stage.length)}% {\n\t}\n`;
 	});
 
-	let newStageName = '';
-	let newStageLength = 0;
+	//let newStageName = '';
+	let timeUntilNewKeyframe = 0;
+	let timeUntilFinalKeyframe = 2;
 
 	function addStage() {
 		if (newStageName.length > 0) {
-			stages = [...stages, { name: newStageName, length: newStageLength }];
+			keyframes = [...keyframes, { name: newStageName, length: timeUntilNewKeyframe }];
 			newStageName = '';
 		}
 	}
 
 	function removeStage(i) {
-		stages = stages.filter((stages, index) => {
+		keyframes = keyframes.filter((keyframes, index) => {
 			return i !== index;
 		});
 	}
 
 	function calculatePercentage(length) {
-		return Math.round((length / calculatedLength) * 100);
+		return Math.round(((length + 1) / calculatedLength) * 100);
 	}
 </script>
 
@@ -38,36 +38,44 @@
 </header>
 <main>
 	<section>
-		<article>
+		<!-- <article>
 			<label for="AnimationName">Animation Name</label>
 			<input id="AnimationName" type="text" bind:value={animationName} />
-		</article>
-
-		<article>
-			<h2>Keyframes</h2>
-			<h4>0%</h4>
-			{#each stages as { name, length }, i}
-				<h4>{calculatePercentage(length)}%</h4>
-				<label for="StageLength[{i}]">Length</label>
-				<input type="number" id="StageLength[{i}]" bind:value={length} />
-				{#if i !== 0}
-					<button on:click={() => removeStage(i)} aria-label="Remove animation stage"
-						>❌</button
-					>
-				{/if}
-			{/each}
-			<h4>End (100%)</h4>
-		</article>
+		</article> -->
 
 		<article>
 			<h4>Add a new keyframe</h4>
 			<!-- <input type="text" bind:value={newStageName} /> -->
 			<label for="NewStageLength">Seconds until this keyframe</label>
-			<input type="number" bind:value={newStageLength} />
-			<button on:click={addStage} disabled={newStageName.length === 0}>Add keyframe</button>
+			<input type="number" bind:value={timeUntilNewKeyframe} />
+			<button on:click={addStage}>Add keyframe</button>
+		</article>
+
+		<article>
+			<h4>Keyframes</h4>
+			<div class="keyframe">
+				<p>0%</p>
+			</div>
+			{#each keyframes as { length }, i}
+				<fieldset class="keyframe">
+					<label for="StageLength[{i}]">{calculatePercentage(length)}%</label>
+					<input type="number" id="StageLength[{i}]" bind:value={length} />
+					{#if i !== 0}
+						<button
+							on:click={() => removeStage(i)}
+							aria-label="Remove animation stage"
+							class="close-button">❌</button
+						>
+					{/if}
+				</fieldset>
+			{/each}
+			<fieldset class="keyframe">
+				<label for="FinalKeyframe">100%</label>
+				<input type="number" id="FinalKeyframe" bind:value={timeUntilFinalKeyframe} />
+			</fieldset>
 		</article>
 	</section>
-	<!-- <pre>{JSON.stringify(stages)}</pre> -->
+	<!-- <pre>{JSON.stringify(keyframes)}</pre> -->
 	<section>
 		<pre>
 .animated-element &#123;
@@ -87,9 +95,24 @@
 </main>
 
 <style>
-	main {
-		display: flex;
-		flex-direction: row;
+	:global(body) {
+		background: linear-gradient(0deg, rgba(232, 232, 232, 1) 0%, rgba(196, 196, 196, 1) 100%);
+	}
+
+	@media (min-width: 680px) {
+		main {
+			display: flex;
+			flex-direction: row;
+		}
+	}
+
+	h1,
+	h4 {
+		color: hsl(0deg, 0%, 20%);
+	}
+
+	article > h4 {
+		margin-top: 0;
 	}
 
 	pre {
@@ -98,6 +121,7 @@
 
 	article {
 		margin: 0 24px 24px 0;
+		background: #fff;
 	}
 
 	article,
@@ -107,5 +131,36 @@
 		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12), 0 2px 2px rgba(0, 0, 0, 0.12),
 			0 4px 4px rgba(0, 0, 0, 0.12), 0 8px 8px rgba(0, 0, 0, 0.12),
 			0 16px 16px rgba(0, 0, 0, 0.12);
+	}
+
+	.keyframe {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		border: 0;
+		margin-left: 0;
+		padding-left: 0;
+	}
+
+	.keyframe > p,
+	.keyframe > label {
+		width: 40px;
+	}
+
+	.keyframe > p {
+		font-weight: 600;
+	}
+
+	.keyframe > label {
+		margin-right: 8px;
+	}
+
+	.keyframe > input {
+		margin: 0;
+	}
+
+	.close-button {
+		background: #fff;
+		border: 0;
 	}
 </style>
