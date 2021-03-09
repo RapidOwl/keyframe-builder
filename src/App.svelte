@@ -1,8 +1,10 @@
 <script>
-	let animationName = 'my-animation';
+	import GitHubCorner from './GitHubCorner.svelte';
 
-	// TODO Is this the best way to model this?
+	let animationName = 'my-animation';
 	let keyframes = [{ length: 2 }, { length: 2 }, { length: 2 }];
+	let timeUntilNewKeyframe = 0;
+	let timeUntilFinalKeyframe = 2;
 
 	$: calculatedLength =
 		keyframes.reduce((a, b) => a + (b['length'] || 0), 0) + timeUntilFinalKeyframe;
@@ -10,10 +12,6 @@
 	$: keyframeDeclarations = keyframes.map((stage) => {
 		return `\t${calculatePercentage(stage.length)}% {\n\t}\n`;
 	});
-
-	//let newStageName = '';
-	let timeUntilNewKeyframe = 0;
-	let timeUntilFinalKeyframe = 2;
 
 	function addStage() {
 		if (newStageName.length > 0) {
@@ -33,19 +31,14 @@
 	}
 </script>
 
+<GitHubCorner />
 <header>
 	<h1>Keyframe Builder</h1>
 </header>
 <main>
 	<section>
-		<!-- <article>
-			<label for="AnimationName">Animation Name</label>
-			<input id="AnimationName" type="text" bind:value={animationName} />
-		</article> -->
-
 		<article>
 			<h4>Add a new keyframe</h4>
-			<!-- <input type="text" bind:value={newStageName} /> -->
 			<label for="NewStageLength">Seconds until this keyframe</label>
 			<input type="number" bind:value={timeUntilNewKeyframe} />
 			<button on:click={addStage}>Add keyframe</button>
@@ -53,6 +46,7 @@
 
 		<article>
 			<h4>Keyframes</h4>
+			<!-- TODO Move the seconds between the keyframes -->
 			<div class="keyframe">
 				<p>0%</p>
 			</div>
@@ -60,13 +54,11 @@
 				<fieldset class="keyframe">
 					<label for="StageLength[{i}]">{calculatePercentage(length)}%</label>
 					<input type="number" id="StageLength[{i}]" bind:value={length} />
-					{#if i !== 0}
-						<button
-							on:click={() => removeStage(i)}
-							aria-label="Remove animation stage"
-							class="close-button">❌</button
-						>
-					{/if}
+					<button
+						on:click={() => removeStage(i)}
+						aria-label="Remove animation stage"
+						class="close-button">❌</button
+					>
 				</fieldset>
 			{/each}
 			<fieldset class="keyframe">
@@ -75,7 +67,6 @@
 			</fieldset>
 		</article>
 	</section>
-	<!-- <pre>{JSON.stringify(keyframes)}</pre> -->
 	<section>
 		<pre>
 .animated-element &#123;
@@ -93,6 +84,7 @@
 	</pre>
 	</section>
 </main>
+<footer>Made by <a href="https://twitter.com/rapidowl" target="_blank">@RapidOwl</a></footer>
 
 <style>
 	:global(body) {
@@ -162,5 +154,10 @@
 	.close-button {
 		background: #fff;
 		border: 0;
+	}
+
+	footer {
+		text-align: center;
+		margin: 15px 0;
 	}
 </style>
