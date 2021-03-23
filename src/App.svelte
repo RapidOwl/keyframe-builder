@@ -4,6 +4,7 @@
 	// TODO Make into components. If nothing else it'll aid readability.
 	// TODO Make buttons so we can switch units between seconds and milliseconds.
 
+	import ExampleAnimation from './ExampleAnimation.svelte';
 	import GitHubCorner from './GitHubCorner.svelte';
 
 	let animationName = 'my-animation';
@@ -52,6 +53,8 @@
 </header>
 <main>
 	<section>
+		<ExampleAnimation {calculatedLength} {keyframes} {keyframePercentages} />
+
 		<article>
 			<h4>Add a new keyframe</h4>
 			<label for="NewStageLength">Seconds until this keyframe</label>
