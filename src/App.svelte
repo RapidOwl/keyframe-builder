@@ -49,12 +49,14 @@
 
 <GitHubCorner />
 <header>
-	<h1>Keyframe Builder</h1>
+	<h1>
+		<span aria-hidden="true">🔑🖼🛠</span>
+		<span class="visually-hidden">Keyframe Builder</span>
+	</h1>
+	<ExampleAnimation {calculatedLength} {keyframes} {keyframePercentages} />
 </header>
 <main>
 	<section>
-		<ExampleAnimation {calculatedLength} {keyframes} {keyframePercentages} />
-
 		<article>
 			<h4>Add a new keyframe</h4>
 			<label for="NewStageLength">Seconds until this keyframe</label>
@@ -85,6 +87,7 @@
 			</fieldset>
 		</article>
 	</section>
+	<div class="spacer" />
 	<section>
 		<pre>
 .animated-element &#123;
@@ -109,15 +112,36 @@
 		background: linear-gradient(0deg, rgba(232, 232, 232, 1) 0%, rgba(196, 196, 196, 1) 100%);
 	}
 
+	:global(*) {
+		box-sizing: border-box;
+	}
+
+	.visually-hidden {
+		clip: rect(0 0 0 0);
+		clip-path: inset(50%);
+		height: 1px;
+		overflow: hidden;
+		position: absolute;
+		white-space: nowrap;
+		width: 1px;
+	}
+
 	@media (min-width: 680px) {
 		main {
+			max-width: 700px;
 			display: flex;
 			flex-direction: row;
+			justify-content: space-evenly;
 		}
+	}
+
+	.spacer {
+		padding: 0 12px;
 	}
 
 	h1 {
 		margin: 24px 0;
+		text-align: center;
 	}
 
 	h1,
@@ -134,7 +158,7 @@
 	}
 
 	article {
-		margin: 0 24px 24px 0;
+		margin-bottom: 24px;
 		background: #fff;
 	}
 

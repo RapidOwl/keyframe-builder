@@ -7,24 +7,31 @@
 
 	$: keyframeMiddleStages = keyframes.map((keyframe, index) => {
 		return `\t${keyframePercentages[index]}% {
-			color: ${colours[index + 1]};
+			background: ${colours[index]};
+			width: ${keyframePercentages[index]}%;
+			opacity: 1;
 		}\n`;
 	}).join(' ');
 
 	$: styleElement = `
 <style>
-	.example {
+	.example-core {
 		animation: cycleColours ${calculatedLength}s ease;
 		animation-iteration-count: infinite;
+		opacity: 0;
 	}
 
 	@keyframes cycleColours {
 		0% {
-			color: ${colours[0]};
+			background: black;
+			width: 28px;
+			opacity: 0;
 		}
 		${keyframeMiddleStages}
 		100% {
-			color: black;
+			background: black;
+			opacity: 0;
+			width: 100%;
 		}
 	}
 </style>
@@ -32,13 +39,37 @@
 </script>
 
 <article>
-	<h4 class="example">Example Animation</h4>
-
 	{@html styleElement}
+
+	<div class="example-wrapper">
+		<div class="example-core"></div>
+	</div>
 </article>
 
 <style>
-	.thing {
-		animation: name duration timing-function delay iteration-count direction fill-mode;
+	.example-wrapper {
+		height: 40px;
+		border: 3px solid black;
+		border-radius: 23px;
+		padding: 3px;
+		margin-bottom: 24px;
+	}
+
+	@media (prefers-reduced-motion) {
+		.example-wrapper {
+			clip: rect(0 0 0 0);
+			clip-path: inset(50%);
+			height: 1px;
+			overflow: hidden;
+			position: absolute;
+			white-space: nowrap;
+			width: 1px;
+		}
+	}
+
+	.example-core {
+		height: 28px;
+		width: 28px;
+		border-radius: 14px;
 	}
 </style>
